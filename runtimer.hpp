@@ -1,21 +1,26 @@
 #pragma once
 #include <chrono>
-#include <iostream>
 
 class RuntimeTimer {
 private:
-    std::chrono::time_point<std::chrono::steady_clock> _start;
-    std::chrono::time_point<std::chrono::steady_clock> _end;
-    std::chrono::duration<double> _elapsed_seconds;
+    using clock = std::chrono::steady_clock;
+    using time_point = std::chrono::time_point<clock>;
+    time_point _start;
+    time_point _end;
+    bool _running{false};
 public:
     void start() {
-        _start = std::chrono::steady_clock::now();
+        _start = clock::now();
+        _running = true;
     }
     void end() {
-        _end = std::chrono::steady_clock::now();
-        _elapsed_seconds = _end - _start;
+        _end = clock::now();
+        _running = false;
     }
     double get_seconds() {
-        return _elapsed_seconds.count();
+        if(_running)
+            return std::chrono::duration<double>(clock::now() - _start).count();
+        else
+            return std::chrono::duration<double>(_end - _start).count();
     }
 };
